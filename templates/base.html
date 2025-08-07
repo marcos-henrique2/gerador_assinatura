@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <title>Gerador de Assinatura de E-mail</title>
+    <style>
+      body {
+        background-color: #e9ecef; /* Um cinza um pouco mais claro */
+      }
+      /* Classe para ajudar a centralizar o conteúdo principal */
+      .main-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+          <i class="fas fa-pencil-alt"></i> Gerador de Assinaturas Navesa
+        </a>
+      </div>
+    </nav>
+
+    <div class="main-container">
+      <div class="container">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-5">{% block content %}{% endblock %}</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center text-muted py-4">
+      <p>
+        &copy; {{ "now" | strftime("%Y") }} Grupo Navesa - Desenvolvido por TI
+      </p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

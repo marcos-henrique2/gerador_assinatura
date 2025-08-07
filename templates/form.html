@@ -1,0 +1,178 @@
+{% extends 'base.html' %} {% block content %}
+<div class="text-center">
+  <h2 class="mb-2">Gerar Assinatura para</h2>
+  <h3 class="display-4 text-primary mb-4">{{ nome_marca }}</h3>
+</div>
+
+<form method="POST" action="{{ url_for('resultado') }}">
+  <h5 class="mb-3 mt-4">1. Seus Dados Pessoais</h5>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="nome">Seu nome:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="nome"
+        name="nome"
+        required
+        placeholder="Nome e Sobrenome"
+      />
+    </div>
+    <div class="form-group col-md-6">
+      <label for="cargo">Cargo:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="cargo"
+        name="cargo"
+        required
+        placeholder="Ex: Analista de Suporte"
+      />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="departamento">Departamento:</label>
+    <input
+      type="text"
+      class="form-control"
+      id="departamento"
+      name="departamento"
+      placeholder="Ex: Tecnologia da Informação"
+    />
+  </div>
+
+  <hr class="my-4" />
+
+  <h5 class="mb-3">2. Dados da Concessionária</h5>
+  <div class="form-group">
+    <label for="concessionaria-select">Selecione a Localidade:</label>
+    <select
+      class="form-control"
+      id="concessionaria-select"
+      name="concessionaria_selecionada"
+      required
+    >
+      <option value="" selected disabled>-- Selecione uma opção --</option>
+      {% for nome_concessionaria in concessionarias %}
+      <option value="{{ nome_concessionaria }}">
+        {{ nome_concessionaria }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-8">
+      <label for="endereco">Endereço:</label>
+      <input
+        type="text"
+        class="form-control bg-light"
+        id="endereco"
+        name="endereco"
+        readonly
+      />
+    </div>
+    <div class="form-group col-md-4">
+      <label for="cidade">Cidade:</label>
+      <input
+        type="text"
+        class="form-control bg-light"
+        id="cidade"
+        name="cidade"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="cep">CEP:</label>
+      <input
+        type="text"
+        class="form-control bg-light"
+        id="cep"
+        name="cep"
+        readonly
+      />
+    </div>
+    <div class="form-group col-md-6">
+      <label for="telefone">Telefone:</label>
+      <input
+        type="text"
+        class="form-control bg-light"
+        id="telefone"
+        name="telefone"
+        readonly
+      />
+    </div>
+  </div>
+
+  <hr class="my-4" />
+
+  <h5 class="mb-3">3. Seus Dados de Contato</h5>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="email">E-mail:</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+        </div>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          required
+          placeholder="seu.email@navesa.com.br"
+        />
+      </div>
+    </div>
+    <div class="form-group col-md-6">
+      <label for="site">Site:</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fas fa-globe"></i></span>
+        </div>
+        <input
+          type="text"
+          class="form-control bg-light"
+          id="site"
+          name="site"
+          readonly
+        />
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">
+    <i class="fas fa-cogs"></i> Gerar Assinatura
+  </button>
+  <a href="{{ url_for('index') }}" class="btn btn-link btn-block mt-2"
+    >Voltar</a
+  >
+</form>
+
+<script>
+  const dadosConcessionarias = {{ dados_json | tojson | safe }};
+  const selectConcessionaria = document.getElementById('concessionaria-select');
+  const inputEndereco = document.getElementById('endereco');
+  const inputCidade = document.getElementById('cidade');
+  const inputCep = document.getElementById('cep');
+  const inputTelefone = document.getElementById('telefone');
+  const inputSite = document.getElementById('site');
+  selectConcessionaria.addEventListener('change', function() {
+      const nomeSelecionado = this.value;
+      if (!nomeSelecionado) {
+          inputEndereco.value = ''; inputCidade.value = '';
+          inputCep.value = ''; inputTelefone.value = '';
+          inputSite.value = '';
+          return;
+      }
+      const dados = dadosConcessionarias[nomeSelecionado];
+      inputEndereco.value = dados.endereco;
+      inputCidade.value = dados.cidade;
+      inputCep.value = dados.cep;
+      inputTelefone.value = dados.telefone;
+      inputSite.value = dados.site;
+  });
+</script>
+{% endblock %}

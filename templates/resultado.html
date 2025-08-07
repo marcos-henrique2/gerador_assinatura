@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% block content %}
+<h2 class="text-center mb-4">Assinatura Gerada com Sucesso!</h2>
+<p class="text-center text-muted">
+  Selecione todo o conteúdo da caixa abaixo, copie (Ctrl+C) e cole na
+  configuração de assinatura do seu cliente de e-mail.
+</p>
+<hr />
+
+<div
+  id="assinatura"
+  style="
+    border: 1px dashed #ccc;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+  "
+>
+  <table
+    border="0"
+    cellpadding="0"
+    cellspacing="0"
+    style="font-family: Arial, sans-serif; font-size: 10pt; color: #333"
+  >
+    <tr>
+      <td style="padding-right: 15px">
+        {% if logo_base64 %}
+        <img
+          src="data:image/png;base64,{{ logo_base64 }}"
+          alt="Logo da Empresa"
+          width="250"
+        />
+        {% endif %}
+      </td>
+
+      <td style="padding-left: 15px">
+        <strong style="color: #0055a5; font-size: 11pt"
+          >{{ dados['nome'] }}</strong
+        ><br />
+        <span style="font-style: italic">{{ dados['cargo'] }}</span><br />
+        <span>{{ dados['departamento'] }}</span><br />
+        <strong style="color: #0055a5"
+          >{{ dados['concessionaria_selecionada'] }}</strong
+        ><br />
+        <span>{{ dados['endereco'] }}</span><br />
+        <span>{{ dados['cidade'] }} - CEP: {{ dados['cep'] }}</span><br />
+        <span>Telefone: {{ dados['telefone'] }}</span><br />
+        <a
+          href="mailto:{{ dados['email'] }}"
+          style="color: #333; text-decoration: none"
+          >{{ dados['email'] }}</a
+        ><br />
+        <a
+          href="http://{{ dados['site'] }}"
+          target="_blank"
+          style="color: #0055a5; text-decoration: none"
+          >{{ dados['site'] }}</a
+        >
+      </td>
+    </tr>
+  </table>
+</div>
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary btn-block mt-4"
+  >← Gerar Outra Assinatura</a
+>
+
+{% endblock %}
