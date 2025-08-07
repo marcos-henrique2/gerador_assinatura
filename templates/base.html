@@ -17,9 +17,8 @@
     <title>Gerador de Assinatura de E-mail</title>
     <style>
       body {
-        background-color: #e9ecef; /* Um cinza um pouco mais claro */
+        background-color: #e9ecef;
       }
-      /* Classe para ajudar a centralizar o conteúdo principal */
       .main-container {
         min-height: 100vh;
         display: flex;
@@ -31,7 +30,8 @@
     <nav class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container">
         <a class="navbar-brand" href="{{ url_for('index') }}">
-          <i class="fas fa-pencil-alt"></i> Gerador de Assinaturas Navesa
+          <i class="fas fa-pencil-alt"></i>
+          Gerador de Assinaturas Navesa
         </a>
       </div>
     </nav>
@@ -45,9 +45,7 @@
     </div>
 
     <footer class="text-center text-muted py-4">
-      <p>
-        &copy; {{ "now" | strftime("%Y") }} Grupo Navesa - Desenvolvido por TI
-      </p>
+      <p>&copy; {{ current_year }} Grupo Navesa - Desenvolvido por TI</p>
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

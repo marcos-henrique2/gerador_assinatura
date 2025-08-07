@@ -3,12 +3,16 @@ from flask import Flask, render_template, abort, request
 import json
 import base64
 import os
+from datetime import datetime # <--- ADICIONADO
 
 app = Flask(__name__)
 
-# Nosso "banco de dados" completo com todas as informações coletadas.
-# Dicionário MARCAS atualizado no app.py
+# Este processador de contexto injeta o ano atual em todos os templates
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}
 
+# Nosso "banco de dados" completo com todas as informações coletadas.
 MARCAS = {
     "Administração": {
         "logo": "grupo_navesa.png",
@@ -17,7 +21,7 @@ MARCAS = {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
                 "cidade": "Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3018-1313",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -28,7 +32,7 @@ MARCAS = {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
                 "cidade": "Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3018-1313",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -39,19 +43,19 @@ MARCAS = {
                 "endereco": "R. T-55, 317 - St. Bueno",
                 "cidade": "Goiânia - GO", "cep": "74215-170",
                 "telefone": "(62) 3413-0600",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             },
             "Navesa GWM - Anápolis": {
                 "endereco": "Av. Brasil Sul, 2750 - CHÁCARAS JONAS DUARTE",
                 "cidade": "Anápolis - GO", "cep": "75120-792",
                 "telefone": "(62) 3772-1200",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             },
             "Navesa GWM - Rio Verde": {
                 "endereco": "R. Marcha p/ o Oeste, 405",
                 "cidade": "Rio Verde - GO", "cep": "75905-700",
                 "telefone": "(64) 3051-5284",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -62,7 +66,7 @@ MARCAS = {
                 "endereco": "Av. Castelo Branco, 87 - St. Bueno",
                 "cidade": "Goiânia - GO", "cep": "74210-185",
                 "telefone": "(62) 3018-1919",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -73,7 +77,7 @@ MARCAS = {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
                 "cidade": "Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3018-1313",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -84,13 +88,13 @@ MARCAS = {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
                 "cidade": "Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3018-1313",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             },
             "Despachante - Anápolis": {
                 "endereco": "Av. Brasil Sul, 4088 - St. Sul Jamil Miguel",
                 "cidade": "Anápolis - GO", "cep": "75124-820",
                 "telefone": "(62) 3310-3700",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -101,25 +105,25 @@ MARCAS = {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
                 "cidade": "Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3018-1313",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             },
             "Ford - Anápolis": {
                 "endereco": "Av. Brasil Sul, 4088 - St. Sul Jamil Miguel",
                 "cidade": "Anápolis - GO", "cep": "75124-820",
                 "telefone": "(62) 3310-3700",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             },
             "Ford - Campo Grande": {
                 "endereco": "Av. Eduardo Elias Zahran, 240 - Jardim Paulista",
                 "cidade": "Campo Grande - MS", "cep": "79050-000",
                 "telefone": "(67) 3047-1250",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             },
             "Ford - Aparecida": {
                 "endereco": "Av. Rio Verde, S/N - Vila Rosa",
                 "cidade": "Aparecida de Goiânia - GO", "cep": "79050-000",
                 "telefone": "(67) 3047-1250",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -130,7 +134,7 @@ MARCAS = {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
                 "cidade": "Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3018-1313",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -141,7 +145,7 @@ MARCAS = {
                 "endereco": "Av. Rio Verde, S/N - Vila Rosa",
                 "cidade": "Aparecida de Goiânia - GO", "cep": "74070-030",
                 "telefone": "(62) 3270-6000",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -152,7 +156,7 @@ MARCAS = {
                 "endereco": "Av. T-63, 1707 - quadra 587 - lote 24 - Nova Suíça",
                 "cidade": "Goiânia - GO", "cep": "74280-235",
                 "telefone": "(62) 3235-8888",
-                "site": "www.navesa.com.br"  # <--- ADICIONADO
+                "site": "www.navesa.com.br"
             }
         }
     }
