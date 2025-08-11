@@ -3,16 +3,21 @@ from flask import Flask, render_template, abort, request
 import json
 import base64
 import os
-from datetime import datetime # <--- ADICIONADO
+from datetime import datetime  # <--- ADICIONADO
 
 app = Flask(__name__)
 
 # Este processador de contexto injeta o ano atual em todos os templates
+
+
 @app.context_processor
 def inject_current_year():
     return {'current_year': datetime.now().year}
 
+
 # Nosso "banco de dados" completo com todas as informações coletadas.
+# SUBSTITUA SEU DICIONÁRIO 'MARCAS' POR ESTE BLOCO COMPLETO
+
 MARCAS = {
     "Administração": {
         "logo": "grupo_navesa.png",
@@ -62,7 +67,8 @@ MARCAS = {
     "Ciaasa": {
         "logo": "ciaasa.png",
         "concessionarias": {
-            "Ford - Goiânia": {
+            # --- CORREÇÃO APLICADA AQUI ---
+            "Ciaasa - Castelo Branco": {
                 "endereco": "Av. Castelo Branco, 87 - St. Bueno",
                 "cidade": "Goiânia - GO", "cep": "74210-185",
                 "telefone": "(62) 3018-1919",

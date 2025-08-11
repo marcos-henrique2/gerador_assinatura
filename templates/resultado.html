@@ -1,8 +1,8 @@
 {% extends 'base.html' %} {% block content %}
 <h2 class="text-center mb-4">Assinatura Gerada com Sucesso!</h2>
 <p class="text-center text-muted">
-  Selecione todo o conteúdo da caixa abaixo, copie (Ctrl+C) e cole na
-  configuração de assinatura do seu cliente de e-mail.
+  Clique no botão abaixo para copiar a assinatura. Depois, cole (Ctrl+V) na
+  configuração do seu cliente de e-mail.
 </p>
 <hr />
 
@@ -27,7 +27,7 @@
         <img
           src="data:image/png;base64,{{ logo_base64 }}"
           alt="Logo da Empresa"
-          width="250"
+          width="150"
         />
         {% endif %}
       </td>
@@ -60,8 +60,55 @@
   </table>
 </div>
 
-<a href="{{ url_for('index') }}" class="btn btn-secondary btn-block mt-4"
-  >← Gerar Outra Assinatura</a
->
+<div class="mt-4">
+  <button id="btn-copiar" class="btn btn-success btn-block">
+    <i class="fas fa-copy"></i> Copiar Assinatura
+  </button>
+  <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block mt-2"
+    >← Gerar Outra Assinatura</a
+  >
+</div>
+
+<script>
+  // 1. Pega os elementos HTML com os quais vamos interagir.
+  const btnCopiar = document.getElementById("btn-copiar");
+  const divAssinatura = document.getElementById("assinatura");
+
+  // 2. Adiciona um "escutador" de evento de clique ao botão.
+  btnCopiar.addEventListener("click", function () {
+    // Pega todo o conteúdo HTML de dentro da div da assinatura.
+    const htmlParaCopiar = divAssinatura.innerHTML;
+
+    // Usa a API moderna do navegador para copiar conteúdo rico (HTML).
+    try {
+      const blob = new Blob([htmlParaCopiar], { type: "text/html" });
+      const clipboardItem = new ClipboardItem({ "text/html": blob });
+
+      navigator.clipboard
+        .write([clipboardItem])
+        .then(function () {
+          // Feedback visual para o usuário
+          const textoOriginal = btnCopiar.innerHTML;
+          btnCopiar.innerHTML = "Copiado com sucesso! ✅";
+          btnCopiar.classList.remove("btn-success");
+          btnCopiar.classList.add("btn-light");
+
+          // Volta ao normal depois de 3 segundos
+          setTimeout(function () {
+            btnCopiar.innerHTML = textoOriginal;
+            btnCopiar.classList.remove("btn-light");
+            btnCopiar.classList.add("btn-success");
+          }, 3000);
+        })
+        .catch(function (err) {
+          console.error("Falha ao copiar HTML: ", err);
+          alert("Não foi possível copiar a assinatura.");
+        });
+    } catch (e) {
+      console.error("Erro de compatibilidade com a API de Clipboard: ", e);
+      alert("Seu navegador pode não suportar esta funcionalidade.");
+    }
+  });
+</script>
 
 {% endblock %}
