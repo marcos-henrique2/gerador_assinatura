@@ -165,6 +165,17 @@ MARCAS = {
                 "site": "www.navesa.com.br"
             }
         }
+    },
+    "Polaris": {
+        "logo": "polares.png",
+        "concessionarias": {
+            "Polares": {
+                "endereco": "Av. Castelo Branco, 3081 - St. Campinas",
+                "cidade": "Goiânia - GO", "cep": "74513-101",
+                "telefone": "(62) 3018-1212",
+                "site": "www.navesa.com.br"
+            }
+        }
     }
 }
 
