@@ -5,6 +5,8 @@
 </div>
 
 <form method="POST" action="{{ url_for('resultado') }}">
+  <input type="hidden" name="marca_selecionada" value="{{ nome_marca }}">
+
   <h5 class="mb-3 mt-4">1. Seu Dados Pessoais</h5>
   <div class="form-row">
     <div class="form-group col-md-6">
@@ -151,14 +153,22 @@
   >
 </form>
 
+<script id="dados-json" type="application/json">
+  {{ dados_json | tojson | safe }}
+</script>
+
 <script>
-  const dadosConcessionarias = {{ dados_json | tojson | safe }};
+  // 2. Lemos o texto do JSON e convertemos nativamente pelo JavaScript
+  const dadosJsonTexto = document.getElementById('dados-json').textContent;
+  const dadosConcessionarias = JSON.parse(dadosJsonTexto);
+
   const selectConcessionaria = document.getElementById('concessionaria-select');
   const inputEndereco = document.getElementById('endereco');
   const inputCidade = document.getElementById('cidade');
   const inputCep = document.getElementById('cep');
   const inputTelefone = document.getElementById('telefone');
   const inputSite = document.getElementById('site');
+  
   selectConcessionaria.addEventListener('change', function() {
       const nomeSelecionado = this.value;
       if (!nomeSelecionado) {

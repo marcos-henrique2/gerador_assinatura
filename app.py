@@ -1,21 +1,19 @@
 # app.py
 from flask import Flask, render_template, abort, request
 import json
-import base64
-import os
-from datetime import datetime # <--- ADICIONADO
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Este processador de contexto injeta o ano atual em todos os templates
+
 @app.context_processor
 def inject_current_year():
     return {'current_year': datetime.now().year}
 
-# Nosso "banco de dados" completo com todas as informações coletadas.
+
 MARCAS = {
     "Administração": {
-        "logo": "grupo_navesa.png",
+        "logo": "admin.png",
         "concessionarias": {
             "GRUPO NAVESA": {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
@@ -26,7 +24,7 @@ MARCAS = {
         }
     },
     "Auditoria": {
-        "logo": "grupo_navesa.png",
+        "logo": "admin.png",
         "concessionarias": {
             "GRUPO NAVESA": {
                 "endereco": "Av. Pires Fernandes, 656 - St. Aeroporto",
@@ -55,6 +53,28 @@ MARCAS = {
                 "endereco": "R. Marcha p/ o Oeste, 405",
                 "cidade": "Rio Verde - GO", "cep": "75905-700",
                 "telefone": "(64) 3051-5284",
+                "site": "www.navesa.com.br"
+            }
+        }
+    },
+    "Geely": {
+        "logo": "geely.jpeg",
+        "concessionarias": {
+            "Navesa Geely": {
+                "endereco": "Av. Mutirão, 3015 - St. Bueno",
+                "cidade": "Goiânia - GO", "cep": "74150-340",
+                "telefone": "(62) 3121-4730",
+                "site": "www.navesa.com.br"
+            }
+        }
+    },
+    "GAC": {
+        "logo": "gac.jpeg",
+        "concessionarias": {
+            "Navesa GAC": {
+                "endereco": "Av. Mutirão, 3300 - St. Bueno",
+                "cidade": "Goiânia - GO", "cep": "74215-240",
+                "telefone": "(62) 3121-4730",
                 "site": "www.navesa.com.br"
             }
         }
@@ -127,7 +147,7 @@ MARCAS = {
             }
         }
     },
-    "Ti": {
+    "TI": {
         "logo": "dept-ti.png",
         "concessionarias": {
             "GRUPO NAVESA": {
@@ -165,14 +185,12 @@ MARCAS = {
 
 @app.route('/')
 def index():
-    """ Rota da página inicial que exibe a lista de Marcas/Departamentos. """
     lista_marcas = MARCAS.keys()
     return render_template('index.html', marcas=lista_marcas)
 
 
 @app.route('/gerar/<marca>')
 def formulario(marca):
-    """ Exibe o formulário de preenchimento para uma marca específica. """
     dados_marca = MARCAS.get(marca)
     if not dados_marca:
         abort(404)
@@ -186,36 +204,21 @@ def formulario(marca):
 
 @app.route('/resultado', methods=['POST'])
 def resultado():
-    # 1. Coleta todos os dados enviados pelo formulário
     dados_formulario = request.form
+    marca_nome = dados_formulario.get('marca_selecionada')
 
-    # 2. Lógica para encontrar o nome do arquivo do logo
     logo_arquivo = None
-    concessionaria_selecionada = dados_formulario.get(
-        'concessionaria_selecionada')
-    for marca, dados_marca in MARCAS.items():
-        if concessionaria_selecionada in dados_marca['concessionarias']:
-            logo_arquivo = dados_marca['logo']
-            break
+    if marca_nome in MARCAS:
+        logo_arquivo = MARCAS[marca_nome]['logo']
 
-    # 3. Lógica para codificar a imagem em Base64
-    logo_base64 = None
+    logo_url = None
     if logo_arquivo:
-        try:
-            # Constrói o caminho completo para o arquivo de imagem
-            caminho_logo = os.path.join(
-                app.static_folder, 'images', logo_arquivo)
-            with open(caminho_logo, 'rb') as f:
-                # Lê o arquivo e codifica em Base64
-                logo_base64 = base64.b64encode(f.read()).decode('utf-8')
-        except FileNotFoundError:
-            # Se o logo não for encontrado, não quebra a aplicação
-            print(f"AVISO: Arquivo de logo não encontrado em: {caminho_logo}")
-            logo_base64 = None
+        url_base = "https://navesa.com.br/uploads/imagens/"
+        logo_url = f"{url_base}{logo_arquivo}"
 
-    # 4. Renderiza o template, passando a imagem codificada
-    return render_template('resultado.html', dados=dados_formulario, logo_base64=logo_base64)
+    return render_template('resultado.html', dados=dados_formulario, logo_url=logo_url)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # host='0.0.0.0' permite que a aplicação seja acessada por outros PCs na rede
+    app.run(host='0.0.0.0', port=5000, debug=True)
