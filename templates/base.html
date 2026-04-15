@@ -1,55 +1,438 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-    <title>Gerador de Assinatura de E-mail</title>
-    <style>
-      body {
-        background-color: #e9ecef;
-      }
-      .main-container {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-dark bg-dark shadow-sm">
-      <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-          <i class="fas fa-pencil-alt"></i>
-          Gerador de Assinaturas Navesa
-        </a>
-      </div>
-    </nav>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Gerador de Assinatura — Grupo Navesa</title>
+  <style>
+    :root {
+      --navy:      #0a1628;
+      --navy-mid:  #112240;
+      --navy-soft: #1e3a5f;
+      --blue:      #0055a5;
+      --blue-light:#1a7fe8;
+      --accent:    #e8a020;
+      --accent-light:#f5c84a;
+      --text:      #e8edf5;
+      --text-muted:#8a9bbf;
+      --border:    rgba(255,255,255,0.08);
+      --glass:     rgba(255,255,255,0.04);
+      --glass-hover: rgba(255,255,255,0.07);
+      --radius:    12px;
+      --radius-lg: 20px;
+      --shadow:    0 8px 32px rgba(0,0,0,0.4);
+      --shadow-sm: 0 2px 12px rgba(0,0,0,0.3);
+    }
 
-    <div class="main-container">
-      <div class="container">
-        <div class="card shadow-lg border-0">
-          <div class="card-body p-5">{% block content %}{% endblock %}</div>
-        </div>
-      </div>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,85,165,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 90% 80%, rgba(232,160,32,0.08) 0%, transparent 50%);
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: rgba(10,22,40,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+
+    .navbar-brand .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,85,165,0.4);
+    }
+
+    .navbar-tag {
+      font-size: 0.7rem;
+      background: rgba(232,160,32,0.15);
+      color: var(--accent-light);
+      border: 1px solid rgba(232,160,32,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* ── CARDS / GLASS ── */
+    .glass-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-header .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      font-weight: 300;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ── STEP LABEL ── */
+    .step-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .step-label .step-num {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .form-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .form-grid.col-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid.col-2 { grid-template-columns: 1fr; }
+      .glass-card { padding: 1.5rem; }
+      .section-header h1 { font-size: 1.5rem; }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    input, select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.88rem;
+      padding: 11px 14px;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .input-wrap.has-icon input,
+    .input-wrap.has-icon select {
+      padding-left: 38px;
+    }
+
+    input::placeholder { color: rgba(138,155,191,0.5); }
+
+    input:focus, select:focus {
+      border-color: var(--blue-light);
+      background: rgba(26,127,232,0.08);
+      box-shadow: 0 0 0 3px rgba(26,127,232,0.15);
+    }
+
+    input[readonly], select[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    input[readonly]:focus {
+      border-color: var(--border);
+      background: rgba(255,255,255,0.05);
+      box-shadow: none;
+    }
+
+    select option {
+      background: var(--navy-mid);
+      color: var(--text);
+    }
+
+    /* Custom select arrow */
+    .select-wrap::after {
+      content: '\f107';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 12px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      padding: 12px 24px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--blue-light));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0,85,165,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,85,165,0.55);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--glass-hover);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #1a9e5e, #22c472);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(26,158,94,0.35);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(26,158,94,0.5);
+    }
+
+    .btn-full { width: 100%; }
+
+    .btn-lg { padding: 15px 32px; font-size: 0.95rem; border-radius: 14px; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      border-top: 1px solid var(--border);
+      opacity: 0.7;
+    }
+
+    /* ── TOAST / ALERT ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      box-shadow: var(--shadow);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 999;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast .toast-icon { font-size: 1.1rem; }
+    .toast.success .toast-icon { color: #22c472; }
+    .toast.error .toast-icon { color: #e85555; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <span class="brand-icon"><i class="fas fa-signature"></i></span>
+      Grupo Navesa
+    </a>
+    <span class="navbar-tag">Assinaturas</span>
+  </nav>
+
+  <main>
+    <div class="page-wrapper">
+      {% block content %}{% endblock %}
     </div>
+  </main>
 
-    <footer class="text-center text-muted py-4">
-      <p>&copy; {{ current_year }} Grupo Navesa - Desenvolvido por TI</p>
-    </footer>
+  <footer>
+    &copy; {{ current_year }} Grupo Navesa &mdash; Desenvolvido pelo Departamento de TI
+  </footer>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  </body>
+  <div class="toast" id="toast">
+    <span class="toast-icon"><i class="fas fa-check-circle"></i></span>
+    <span id="toast-msg">Ação realizada.</span>
+  </div>
+
+  <script>
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      const icon = t.querySelector('.toast-icon i');
+      document.getElementById('toast-msg').textContent = msg;
+      t.className = 'toast ' + type;
+      icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
 </html>

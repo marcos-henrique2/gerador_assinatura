@@ -1,178 +1,451 @@
-{% extends 'base.html' %} {% block content %}
-<div class="text-center">
-  <h2 class="mb-2">Gerar Assinatura para</h2>
-  <h3 class="display-4 text-primary mb-4">{{ nome_marca }}</h3>
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--text); }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(0,85,165,0.3), rgba(26,127,232,0.2));
+    border: 1px solid rgba(26,127,232,0.4);
+    border-radius: 30px;
+    padding: 6px 16px 6px 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .brand-badge .dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+  }
+
+  .progress-steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2.5rem;
+    position: relative;
+  }
+
+  .progress-steps::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 16px;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  .step-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+
+  .step-item.active .step-circle {
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    border-color: var(--blue-light);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0,85,165,0.45);
+  }
+
+  .step-item.done .step-circle {
+    background: linear-gradient(135deg, #1a9e5e, #22c472);
+    border-color: #22c472;
+    color: #fff;
+  }
+
+  .step-text {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .step-item.active .step-text { color: var(--blue-light); }
+  .step-item.done .step-text { color: #22c472; }
+
+  /* Concessionaria card select */
+  .concession-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .concession-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .concession-card:hover {
+    border-color: rgba(26,127,232,0.5);
+    background: rgba(26,127,232,0.06);
+  }
+
+  .concession-card.selected {
+    border-color: var(--blue-light);
+    background: rgba(26,127,232,0.1);
+  }
+
+  .concession-card.selected::after {
+    content: '\f058';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: var(--blue-light);
+    font-size: 14px;
+  }
+
+  .concession-name {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .concession-city {
+    font-size: 0.73rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .address-fields {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    display: none;
+  }
+
+  .address-fields.visible { display: block; }
+
+  .address-info-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .address-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 130px;
+  }
+
+  .address-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .address-value {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .hidden-select { display: none; }
+</style>
+
+<div class="page-header animate-in">
+  <a href="{{ url_for('index') }}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Voltar
+  </a>
+  <div class="brand-badge">
+    <div class="dot"><i class="fas fa-{{ icone }}"></i></div>
+    {{ nome_marca }}
+  </div>
 </div>
 
-<form method="POST" action="{{ url_for('resultado') }}">
-  <h5 class="mb-3 mt-4">1. Seus Dados Pessoais</h5>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="nome">Seu nome:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="nome"
-        name="nome"
-        required
-        placeholder="Nome e Sobrenome"
-      />
-    </div>
-    <div class="form-group col-md-6">
-      <label for="cargo">Cargo:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="cargo"
-        name="cargo"
-        required
-        placeholder="Ex: Analista de Suporte"
-      />
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="departamento">Departamento:</label>
-    <input
-      type="text"
-      class="form-control"
-      id="departamento"
-      name="departamento"
-      placeholder="Ex: Tecnologia da Informação"
-    />
+<div class="glass-card animate-in delay-1">
+
+  <div class="section-header" style="margin-bottom: 2rem;">
+    <div class="eyebrow">Nova Assinatura</div>
+    <h1 style="font-size: 1.5rem;">Preencha seus dados</h1>
   </div>
 
-  <hr class="my-4" />
-
-  <h5 class="mb-3">2. Dados da Concessionária</h5>
-  <div class="form-group">
-    <label for="concessionaria-select">Selecione a Localidade:</label>
-    <select
-      class="form-control"
-      id="concessionaria-select"
-      name="concessionaria_selecionada"
-      required
-    >
-      <option value="" selected disabled>-- Selecione uma opção --</option>
-      {% for nome_concessionaria in concessionarias %}
-      <option value="{{ nome_concessionaria }}">
-        {{ nome_concessionaria }}
-      </option>
-      {% endfor %}
-    </select>
-  </div>
-
-  <div class="form-row">
-    <div class="form-group col-md-8">
-      <label for="endereco">Endereço:</label>
-      <input
-        type="text"
-        class="form-control bg-light"
-        id="endereco"
-        name="endereco"
-        readonly
-      />
+  <div class="progress-steps">
+    <div class="step-item active" id="step1-indicator">
+      <div class="step-circle">1</div>
+      <span class="step-text">Pessoal</span>
     </div>
-    <div class="form-group col-md-4">
-      <label for="cidade">Cidade:</label>
-      <input
-        type="text"
-        class="form-control bg-light"
-        id="cidade"
-        name="cidade"
-        readonly
-      />
+    <div class="step-item" id="step2-indicator">
+      <div class="step-circle">2</div>
+      <span class="step-text">Localidade</span>
     </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="cep">CEP:</label>
-      <input
-        type="text"
-        class="form-control bg-light"
-        id="cep"
-        name="cep"
-        readonly
-      />
-    </div>
-    <div class="form-group col-md-6">
-      <label for="telefone">Telefone:</label>
-      <input
-        type="text"
-        class="form-control bg-light"
-        id="telefone"
-        name="telefone"
-        readonly
-      />
+    <div class="step-item" id="step3-indicator">
+      <div class="step-circle">3</div>
+      <span class="step-text">Contato</span>
     </div>
   </div>
 
-  <hr class="my-4" />
+  <form method="POST" action="{{ url_for('resultado') }}" id="sigForm">
+    <input type="hidden" name="marca_selecionada" value="{{ nome_marca }}">
 
-  <h5 class="mb-3">3. Seus Dados de Contato</h5>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="email">E-mail:</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+    <!-- STEP 1: Dados Pessoais -->
+    <div class="form-section" id="step1">
+      <div class="step-label">
+        <span class="step-num">1</span>
+        Dados Pessoais
+      </div>
+
+      <div class="form-grid col-2">
+        <div class="form-field">
+          <label for="nome">Nome Completo</label>
+          <div class="input-wrap has-icon">
+            <i class="fas fa-user icon"></i>
+            <input type="text" id="nome" name="nome" required placeholder="Nome e Sobrenome" />
+          </div>
         </div>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          name="email"
-          required
-          placeholder="seu.email@navesa.com.br"
-        />
+        <div class="form-field">
+          <label for="cargo">Cargo</label>
+          <div class="input-wrap has-icon">
+            <i class="fas fa-briefcase icon"></i>
+            <input type="text" id="cargo" name="cargo" required placeholder="Ex: Analista de Suporte" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top: 1rem;">
+        <div class="form-field">
+          <label for="departamento">Departamento</label>
+          <div class="input-wrap has-icon">
+            <i class="fas fa-sitemap icon"></i>
+            <input type="text" id="departamento" name="departamento" placeholder="Ex: Tecnologia da Informação" />
+          </div>
+        </div>
       </div>
     </div>
-    <div class="form-group col-md-6">
-      <label for="site">Site:</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fas fa-globe"></i></span>
+
+    <hr class="divider" />
+
+    <!-- STEP 2: Concessionária -->
+    <div class="form-section" id="step2">
+      <div class="step-label">
+        <span class="step-num">2</span>
+        Dados da Localidade
+      </div>
+
+      <div class="form-field">
+        <label>Selecione a Unidade</label>
+        <div class="concession-cards" id="concessionCards">
+          {% for nome_concessionaria in concessionarias %}
+          <div class="concession-card" data-value="{{ nome_concessionaria }}" onclick="selectConcession(this)">
+            <div class="concession-name">{{ nome_concessionaria }}</div>
+            <div class="concession-city">
+              <i class="fas fa-map-marker-alt" style="font-size: 10px; color: var(--accent);"></i>
+              <span id="city-{{ loop.index }}">—</span>
+            </div>
+          </div>
+          {% endfor %}
         </div>
-        <input
-          type="text"
-          class="form-control bg-light"
-          id="site"
-          name="site"
-          readonly
-        />
+        <select class="hidden-select" id="concessionaria-select" name="concessionaria_selecionada" required>
+          <option value="" selected disabled>— selecione —</option>
+          {% for nome_concessionaria in concessionarias %}
+          <option value="{{ nome_concessionaria }}">{{ nome_concessionaria }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="address-fields" id="addressFields">
+        <div class="address-info-row">
+          <div class="address-info-item">
+            <span class="address-label"><i class="fas fa-road" style="margin-right: 4px;"></i>Endereço</span>
+            <span class="address-value" id="disp-endereco">—</span>
+          </div>
+          <div class="address-info-item">
+            <span class="address-label"><i class="fas fa-city" style="margin-right: 4px;"></i>Cidade</span>
+            <span class="address-value" id="disp-cidade">—</span>
+          </div>
+          <div class="address-info-item">
+            <span class="address-label"><i class="fas fa-map-pin" style="margin-right: 4px;"></i>CEP</span>
+            <span class="address-value" id="disp-cep">—</span>
+          </div>
+          <div class="address-info-item">
+            <span class="address-label"><i class="fas fa-phone" style="margin-right: 4px;"></i>Telefone</span>
+            <span class="address-value" id="disp-telefone">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden inputs to carry data -->
+      <input type="hidden" id="endereco" name="endereco" />
+      <input type="hidden" id="cidade" name="cidade" />
+      <input type="hidden" id="cep" name="cep" />
+      <input type="hidden" id="telefone" name="telefone" />
+      <input type="hidden" id="site" name="site" />
+    </div>
+
+    <hr class="divider" />
+
+    <!-- STEP 3: Contato -->
+    <div class="form-section" id="step3">
+      <div class="step-label">
+        <span class="step-num">3</span>
+        Contato
+      </div>
+
+      <div class="form-grid col-2">
+        <div class="form-field">
+          <label for="email">E-mail Corporativo</label>
+          <div class="input-wrap has-icon">
+            <i class="fas fa-envelope icon"></i>
+            <input type="email" id="email" name="email" required placeholder="seu.email@navesa.com.br" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="site-disp">Site</label>
+          <div class="input-wrap has-icon">
+            <i class="fas fa-globe icon"></i>
+            <input type="text" id="site-disp" placeholder="Preenchido automaticamente" readonly />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">
-    <i class="fas fa-cogs"></i> Gerar Assinatura
-  </button>
-  <a href="{{ url_for('index') }}" class="btn btn-link btn-block mt-2"
-    >Voltar</a
-  >
-</form>
+    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 10px;">
+      <button type="submit" class="btn btn-primary btn-lg btn-full" id="submitBtn">
+        <i class="fas fa-magic"></i>
+        Gerar Assinatura
+      </button>
+      <a href="{{ url_for('index') }}" class="btn btn-ghost btn-full">
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>
 
+<script id="dados-json" type="application/json">{{ dados_json | tojson | safe }}</script>
 <script>
-  const dadosConcessionarias = {{ dados_json | tojson | safe }};
-  const selectConcessionaria = document.getElementById('concessionaria-select');
-  const inputEndereco = document.getElementById('endereco');
-  const inputCidade = document.getElementById('cidade');
-  const inputCep = document.getElementById('cep');
-  const inputTelefone = document.getElementById('telefone');
-  const inputSite = document.getElementById('site');
-  selectConcessionaria.addEventListener('change', function() {
-      const nomeSelecionado = this.value;
-      if (!nomeSelecionado) {
-          inputEndereco.value = ''; inputCidade.value = '';
-          inputCep.value = ''; inputTelefone.value = '';
-          inputSite.value = '';
-          return;
-      }
-      const dados = dadosConcessionarias[nomeSelecionado];
-      inputEndereco.value = dados.endereco;
-      inputCidade.value = dados.cidade;
-      inputCep.value = dados.cep;
-      inputTelefone.value = dados.telefone;
-      inputSite.value = dados.site;
+  const dadosConcessionarias = JSON.parse(document.getElementById('dados-json').textContent);
+
+  // Pre-fill city on cards
+  document.querySelectorAll('.concession-card').forEach((card, idx) => {
+    const nome = card.dataset.value;
+    const dados = dadosConcessionarias[nome];
+    if (dados) {
+      const cityEl = card.querySelector('.concession-city span');
+      if (cityEl) cityEl.textContent = dados.cidade;
+    }
+  });
+
+  function selectConcession(el) {
+    document.querySelectorAll('.concession-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+
+    const nome = el.dataset.value;
+    const dados = dadosConcessionarias[nome];
+
+    document.getElementById('concessionaria-select').value = nome;
+    document.getElementById('endereco').value = dados.endereco;
+    document.getElementById('cidade').value = dados.cidade;
+    document.getElementById('cep').value = dados.cep;
+    document.getElementById('telefone').value = dados.telefone;
+    document.getElementById('site').value = dados.site;
+    document.getElementById('site-disp').value = dados.site;
+
+    // Update display
+    document.getElementById('disp-endereco').textContent = dados.endereco;
+    document.getElementById('disp-cidade').textContent = dados.cidade;
+    document.getElementById('disp-cep').textContent = dados.cep;
+    document.getElementById('disp-telefone').textContent = dados.telefone;
+
+    const af = document.getElementById('addressFields');
+    af.classList.add('visible');
+
+    // Update step indicators
+    document.getElementById('step2-indicator').classList.add('done');
+    document.getElementById('step2-indicator').querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:10px"></i>';
+    document.getElementById('step3-indicator').classList.add('active');
+  }
+
+  // Step 1 completion
+  const step1Inputs = document.querySelectorAll('#step1 input[required]');
+  step1Inputs.forEach(inp => {
+    inp.addEventListener('blur', checkStep1);
+  });
+
+  function checkStep1() {
+    const allFilled = Array.from(step1Inputs).every(i => i.value.trim() !== '');
+    if (allFilled) {
+      document.getElementById('step1-indicator').classList.add('done');
+      document.getElementById('step1-indicator').querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:10px"></i>';
+      document.getElementById('step2-indicator').classList.add('active');
+    }
+  }
+
+  // Form validation
+  document.getElementById('sigForm').addEventListener('submit', function(e) {
+    const concSelect = document.getElementById('concessionaria-select');
+    if (!concSelect.value) {
+      e.preventDefault();
+      showToast('Por favor, selecione uma unidade.', 'error');
+      document.getElementById('concessionCards').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   });
 </script>
 {% endblock %}

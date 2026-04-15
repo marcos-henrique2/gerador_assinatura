@@ -1,114 +1,162 @@
-{% extends 'base.html' %} {% block content %}
-<h2 class="text-center mb-4">Assinatura Gerada com Sucesso!</h2>
-<p class="text-center text-muted">
-  Clique no botão abaixo para copiar a assinatura. Depois, cole (Ctrl+V) na
-  configuração do seu cliente de e-mail.
-</p>
-<hr />
+{% extends 'base.html' %}
 
-<div
-  id="assinatura"
-  style="
-    border: 1px dashed #ccc;
-    padding: 20px;
-    font-family: Arial, sans-serif;
+{% block content %}
+<style>
+  .success-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(26,158,94,0.15), rgba(34,196,114,0.08));
+    border: 1px solid rgba(34,196,114,0.3);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 2rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #5de39c;
+  }
+
+  .success-banner i { font-size: 1.2rem; }
+
+  .sig-preview-wrapper {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+
+  .sig-preview-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sig-preview-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .actions-row { grid-template-columns: 1fr; }
+  }
+
+  .copy-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .copy-hint i { color: var(--accent); }
+
+  /* The actual email signature (rendered in white bg) */
+  #assinatura {
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
-  "
->
-  <table
-    border="0"
-    cellpadding="0"
-    cellspacing="0"
-    style="font-family: Arial, sans-serif; font-size: 10pt; color: #333"
-  >
-    <tr>
-      <td style="padding-right: 15px">
-        {% if logo_base64 %}
-        <img
-          src="data:image/png;base64,{{ logo_base64 }}"
-          alt="Logo da Empresa"
-          width="150"
-        />
-        {% endif %}
-      </td>
+  }
+</style>
 
-      <td style="padding-left: 15px">
-        <strong style="color: #0055a5; font-size: 11pt"
-          >{{ dados['nome'] }}</strong
-        ><br />
-        <span style="font-style: italic">{{ dados['cargo'] }}</span><br />
-        <span>{{ dados['departamento'] }}</span><br />
-        <strong style="color: #0055a5"
-          >{{ dados['concessionaria_selecionada'] }}</strong
-        ><br />
-        <span>{{ dados['endereco'] }}</span><br />
-        <span>{{ dados['cidade'] }} - CEP: {{ dados['cep'] }}</span><br />
-        <span>Telefone: {{ dados['telefone'] }}</span><br />
-        <a
-          href="mailto:{{ dados['email'] }}"
-          style="color: #333; text-decoration: none"
-          >{{ dados['email'] }}</a
-        ><br />
-        <a
-          href="http://{{ dados['site'] }}"
-          target="_blank"
-          style="color: #0055a5; text-decoration: none"
-          >{{ dados['site'] }}</a
-        >
-      </td>
-    </tr>
-  </table>
+<div class="section-header animate-in" style="margin-bottom: 1.5rem;">
+  <div class="eyebrow">Pronta!</div>
+  <h1 style="font-size: 1.6rem;">Sua assinatura foi gerada</h1>
 </div>
 
-<div class="mt-4">
-  <button id="btn-copiar" class="btn btn-success btn-block">
-    <i class="fas fa-copy"></i> Copiar Assinatura
-  </button>
-  <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block mt-2"
-    >← Gerar Outra Assinatura</a
-  >
+<div class="success-banner animate-in delay-1">
+  <i class="fas fa-check-circle"></i>
+  Assinatura criada com sucesso para <strong>{{ dados['nome'] }}</strong>
+</div>
+
+<div class="glass-card animate-in delay-2">
+  <div class="sig-preview-label">
+    <i class="fas fa-eye" style="font-size: 11px;"></i>
+    Pré-visualização
+  </div>
+
+  <div class="sig-preview-wrapper">
+    <div id="assinatura"><table border="0" cellpadding="0" cellspacing="0" style="font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:9pt;color:#3a3a3a;line-height:1.5"><tr>
+{%- if logo_url %}<td style="padding-right:18px;vertical-align:middle"><img src="{{ logo_url }}" alt="" width="160" style="display:block;border:none"></td>{%- if not logo_tem_barra %}<td style="padding:0 16px 0 0;vertical-align:middle"><div style="width:1px;height:80px;background:#ccc"></div></td>{%- endif %}
+{%- endif %}<td style="vertical-align:middle"><p style="margin:0 0 1px 0;font-size:11pt;font-weight:700;color:#1a1a2e">{{ dados['nome'] }}</p><p style="margin:0 0 5px 0;font-size:8.5pt;color:#1a1a1a;font-style:italic">{{ dados['cargo'] }}{%- if dados['departamento'] %} &middot; {{ dados['departamento'] }}{%- endif %}</p><table border="0" cellpadding="0" cellspacing="0" style="margin:0 0 5px 0"><tr><td style="height:1px;width:220px;background:#e0e0e0;font-size:0;line-height:0"> </td></tr></table><p style="margin:0 0 2px 0;font-size:9pt"><strong style="color:#003399">{{ dados['concessionaria_selecionada'] }}</strong> <span style="color:#bbb">|</span> <span style="color:#1a1a1a">{{ dados['telefone'] }}</span></p><p style="margin:0 0 4px 0;font-size:8.5pt;color:#1a1a1a">{{ dados['endereco'] }} &mdash; {{ dados['cidade'] }} &middot; CEP {{ dados['cep'] }}</p><p style="margin:0;font-size:8.5pt"><a href="mailto:{{ dados['email'] }}" style="color:#1a1a1a;text-decoration:none">{{ dados['email'] }}</a> <span style="color:#bbb">|</span> <a href="http://{{ dados['site'] }}" target="_blank" style="color:#003399;font-weight:600;text-decoration:none">{{ dados['site'] }}</a></p></td></tr></table></div>
+  </div>
+
+  <div class="actions-row">
+    <button id="btn-copiar" class="btn btn-success btn-lg" onclick="copiarAssinatura()">
+      <i class="fas fa-copy"></i>
+      Copiar Assinatura
+    </button>
+    <a href="{{ url_for('index') }}" class="btn btn-ghost btn-lg">
+      <i class="fas fa-redo"></i>
+      Nova Assinatura
+    </a>
+  </div>
+
+  <p class="copy-hint">
+    <i class="fas fa-lightbulb"></i>
+    Após copiar, cole com <kbd style="background: rgba(255,255,255,0.08); border-radius: 4px; padding: 2px 6px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.15);">Ctrl+V</kbd>
+    diretamente no seu cliente de e-mail (Outlook, Gmail, etc.)
+  </p>
+</div>
+
+<div class="glass-card animate-in delay-3" style="margin-top: 1rem;">
+  <div class="step-label" style="margin-bottom: 0.75rem;">
+    <i class="fas fa-info-circle" style="color: var(--blue-light);"></i>
+    Como usar no Outlook
+  </div>
+  <ol style="color: var(--text-muted); font-size: 0.82rem; line-height: 1.9; padding-left: 1.2rem;">
+    <li>Clique em <strong style="color: var(--text);">Copiar Assinatura</strong> acima</li>
+    <li>Abra o Outlook → <strong style="color: var(--text);">Arquivo → Opções → Email → Assinaturas</strong></li>
+    <li>Crie uma nova assinatura e cole com <kbd style="background: rgba(255,255,255,0.08); border-radius: 4px; padding: 1px 5px; border: 1px solid var(--border);">Ctrl+V</kbd></li>
+    <li>Salve e defina como padrão para novos emails</li>
+  </ol>
 </div>
 
 <script>
-  // 1. Pega os elementos HTML com os quais vamos interagir.
-  const btnCopiar = document.getElementById("btn-copiar");
-  const divAssinatura = document.getElementById("assinatura");
+  function copiarAssinatura() {
+    const btn = document.getElementById('btn-copiar');
+    const divAssinatura = document.getElementById('assinatura');
 
-  // 2. Adiciona um "escutador" de evento de clique ao botão.
-  btnCopiar.addEventListener("click", function () {
-    // Pega todo o conteúdo HTML de dentro da div da assinatura.
-    const htmlParaCopiar = divAssinatura.innerHTML;
-
-    // Usa a API moderna do navegador para copiar conteúdo rico (HTML).
     try {
-      const blob = new Blob([htmlParaCopiar], { type: "text/html" });
-      const clipboardItem = new ClipboardItem({ "text/html": blob });
+      const range = document.createRange();
+      range.selectNode(divAssinatura);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      const ok = document.execCommand('copy');
+      sel.removeAllRanges();
 
-      navigator.clipboard
-        .write([clipboardItem])
-        .then(function () {
-          // Feedback visual para o usuário
-          const textoOriginal = btnCopiar.innerHTML;
-          btnCopiar.innerHTML = "Copiado com sucesso! ✅";
-          btnCopiar.classList.remove("btn-success");
-          btnCopiar.classList.add("btn-light");
-
-          // Volta ao normal depois de 3 segundos
-          setTimeout(function () {
-            btnCopiar.innerHTML = textoOriginal;
-            btnCopiar.classList.remove("btn-light");
-            btnCopiar.classList.add("btn-success");
-          }, 3000);
-        })
-        .catch(function (err) {
-          console.error("Falha ao copiar HTML: ", err);
-          alert("Não foi possível copiar a assinatura.");
-        });
-    } catch (e) {
-      console.error("Erro de compatibilidade com a API de Clipboard: ", e);
-      alert("Seu navegador pode não suportar esta funcionalidade.");
+      if (ok) {
+        btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        btn.style.background = 'linear-gradient(135deg, #1a9e5e, #22c472)';
+        showToast('Assinatura copiada com sucesso!', 'success');
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Assinatura';
+          btn.style.background = '';
+        }, 3000);
+      } else {
+        showToast('Não foi possível copiar. Selecione e use Ctrl+C.', 'error');
+      }
+    } catch (err) {
+      showToast('Erro ao copiar. Tente selecionar manualmente.', 'error');
     }
-  });
+  }
 </script>
-
 {% endblock %}

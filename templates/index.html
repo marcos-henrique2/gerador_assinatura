@@ -1,33 +1,234 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="text-center">
-        <h2 class="mb-2">Gerador de Assinatura Eletrônica</h2>
-        <p class="lead text-muted">Selecione sua marca ou departamento para começar.</p>
+<div class="section-header animate-in">
+  <div class="eyebrow">Grupo Navesa</div>
+  <h1>Gerador de Assinatura</h1>
+  <p>Selecione sua marca ou departamento para criar sua assinatura profissional.</p>
+</div>
+
+<style>
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .filter-btn:hover,
+  .filter-btn.active {
+    background: rgba(0,85,165,0.2);
+    border-color: var(--blue-light);
+    color: var(--text);
+  }
+
+  .brands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .brand-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.25rem;
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    transition: all 0.25s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,85,165,0.12) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .brand-card:hover {
+    border-color: rgba(26,127,232,0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(26,127,232,0.2);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .brand-card:hover::before { opacity: 1; }
+
+  .brand-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,85,165,0.35);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .brand-icon-wrap.cat-gestao {
+    background: linear-gradient(135deg, #1e5799, #2989d8);
+  }
+
+  .brand-icon-wrap.cat-servicos {
+    background: linear-gradient(135deg, #2c7a4b, #3eb86e);
+  }
+
+  .brand-icon-wrap.cat-concessionaria {
+    background: linear-gradient(135deg, #7b3fa0, #b05edc);
+  }
+
+  .brand-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-cat-tag {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-arrow {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    color: var(--border);
+    font-size: 11px;
+    transition: color 0.2s, transform 0.2s;
+  }
+
+  .brand-card:hover .brand-arrow {
+    color: var(--blue-light);
+    transform: translate(2px, -2px);
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    justify-content: center;
+  }
+
+  .stat-pill {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-pill i { color: var(--accent); font-size: 11px; }
+
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+    display: none;
+  }
+
+  .no-results i { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.4; }
+</style>
+
+<div class="stats-row animate-in delay-1">
+  <div class="stat-pill"><i class="fas fa-layer-group"></i> {{ marcas|length }} marcas e departamentos</div>
+  <div class="stat-pill"><i class="fas fa-map-marker-alt"></i> GO / MS</div>
+</div>
+
+<div class="filter-bar animate-in delay-1" id="filterBar">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="Concessionária">Concessionárias</button>
+  <button class="filter-btn" data-filter="Serviços">Serviços</button>
+  <button class="filter-btn" data-filter="Gestão">Gestão</button>
+</div>
+
+<div class="brands-grid animate-in delay-2" id="brandsGrid">
+  {% for nome_marca, dados in marcas.items() %}
+  {% set cat = dados.get('categoria', 'Gestão') %}
+  {% set cat_class = cat | lower | replace('ã', 'a') | replace('ç', 'c') %}
+  <a href="{{ url_for('formulario', marca=nome_marca) }}"
+     class="brand-card"
+     data-categoria="{{ cat }}">
+    <div class="brand-icon-wrap cat-{{ cat_class }}">
+      <i class="fas fa-{{ dados.get('icone', 'building') }}"></i>
     </div>
-    <hr class="my-4">
-    <div class="row text-center">
-        {% for marca in marcas %}
-            <div class="col-md-4 mb-4">
-                <a href="{{ url_for('formulario', marca=marca) }}" class="card-link text-decoration-none">
-                    <div class="card h-100 card-hover">
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            <h5 class="card-title mb-0">{{ marca }}</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        {% else %}
-            <p>Nenhuma marca configurada.</p>
-        {% endfor %}
+    <div>
+      <div class="brand-name">{{ nome_marca }}</div>
+      <div class="brand-cat-tag">{{ cat }}</div>
     </div>
-    <style>
-        .card-link .card-hover {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card-link:hover .card-hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0,0,0,.12) !important;
-        }
-    </style>
+    <i class="fas fa-arrow-up-right brand-arrow"></i>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="no-results" id="noResults">
+  <div><i class="fas fa-search"></i></div>
+  <p>Nenhum resultado encontrado.</p>
+</div>
+
+<script>
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.brand-card');
+  const noResults = document.getElementById('noResults');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter;
+      let visible = 0;
+
+      cards.forEach(card => {
+        const match = filter === 'all' || card.dataset.categoria === filter;
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    });
+  });
+</script>
 {% endblock %}
