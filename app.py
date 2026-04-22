@@ -203,6 +203,25 @@ MARCAS = {
                 "cidade": "Goiânia - GO", "cep": "74280-235",
                 "telefone": "(62) 3235-8888",
                 "site": "www.navesa.com.br"
+            },
+            "Renault - Campinas": {
+                "endereco": "Av. Castelo Branco, 3081 - St. Campinas",
+                "cidade": "Goiânia - GO", "cep": "74513-101",
+                "telefone": "(62) 3018-1212",
+                "site": "www.navesa.com.br"
+            }
+        }
+    },
+    "Polaris": {
+        "logo": "polaris.png",
+        "categoria": "Concessionária",
+        "icone": "car",
+        "concessionarias": {
+            "Polaris - Campinas": {
+                "endereco": "Av. Castelo Branco, 3081 - St. Campinas",
+                "cidade": "Goiânia - GO", "cep": "74513-101",
+                "telefone": "(62) 3018-1212",
+                "site": "www.navesa.com.br"
             }
         }
     }
