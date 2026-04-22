@@ -119,7 +119,6 @@ MARCAS = {
     },
     "Despachante": {
         "logo": "despachante.png",
-        "logo_tem_barra": True,
         "categoria": "Serviços",
         "icone": "file-alt",
         "concessionarias": {
@@ -169,7 +168,7 @@ MARCAS = {
         }
     },
     "TI": {
-        "logo": "dept-ti.png",
+        "logo": "tinavesa.png",
         "categoria": "Gestão",
         "icone": "laptop-code",
         "concessionarias": {
