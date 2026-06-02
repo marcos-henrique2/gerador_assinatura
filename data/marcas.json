@@ -52,6 +52,13 @@
                 "cep": "75905-700",
                 "telefone": "(64) 3051-5284",
                 "site": "www.navesa.com.br"
+            },
+            "Navesa GWM - Aparecida": {
+                "endereco": "Av. Rio Verde, Qd. 44, Lt. 5 - Setor Vila Rosa",
+                "cidade": "Aparecida de Goiânia - GO",
+                "cep": "74935-851",
+                "telefone": "",
+                "site": "www.navesa.com.br"
             }
         }
     },
@@ -206,6 +213,55 @@
                 "cidade": "Goiânia - GO",
                 "cep": "74280-235",
                 "telefone": "(62) 3235-8888",
+                "site": "www.navesa.com.br"
+            },
+            "Renault - Campinas": {
+                "endereco": "Av. Castelo Branco, 3081 - St. Campinas",
+                "cidade": "Goiânia - GO",
+                "cep": "74513-101",
+                "telefone": "(62) 3018-1212",
+                "site": "www.navesa.com.br"
+            }
+        }
+    },
+    "Polaris": {
+        "logo": "polaris.png",
+        "categoria": "Concessionária",
+        "icone": "car",
+        "concessionarias": {
+            "Navesa Polaris": {
+                "endereco": "Av. Castelo Branco, 3081 - St. Campinas",
+                "cidade": "Goiânia - GO",
+                "cep": "74513-101",
+                "telefone": "(62) 3018-1212",
+                "site": "www.navesa.com.br"
+            }
+        }
+    },
+    "Navesa Porangatu": {
+        "logo": "porangatu.png",
+        "categoria": "Concessionária",
+        "icone": "car",
+        "concessionarias": {
+            "Navesa Ford - Porangatu": {
+                "endereco": "R. 2 - Vila Soares",
+                "cidade": "Porangatu - GO",
+                "cep": "76550-162",
+                "telefone": "(62) 3132-0372",
+                "site": "www.navesa.com.br"
+            }
+        }
+    },
+    "Citroën": {
+        "logo": "citroen.png",
+        "categoria": "Concessionária",
+        "icone": "car",
+        "concessionarias": {
+            "Navesa Citroën - Aparecida": {
+                "endereco": "Av. Rio Verde - Vila Rosa",
+                "cidade": "Aparecida de Goiânia - GO",
+                "cep": "74935-851",
+                "telefone": "(62) 3270-6000",
                 "site": "www.navesa.com.br"
             }
         }
