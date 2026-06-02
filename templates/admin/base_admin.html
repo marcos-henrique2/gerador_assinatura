@@ -79,9 +79,16 @@
     .flash{padding:12px 16px;border-radius:var(--radius);margin-bottom:1rem;
       font-size:0.85rem;display:flex;align-items:center;gap:10px;}
     .flash.success{background:rgba(34,196,114,0.12);border:1px solid rgba(34,196,114,0.3);color:#5de39c;}
+    .flash.warning{background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.4);color:var(--accent-light);}
     .flash.error{background:rgba(232,85,85,0.12);border:1px solid rgba(232,85,85,0.35);color:#ff8a8a;}
     .inline-form{display:inline;}
     .muted{color:var(--text-muted);}
+    .logo-preview{display:flex;align-items:center;gap:14px;background:#fff;
+      border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;}
+    .logo-preview img{max-width:200px;max-height:80px;height:auto;display:block;}
+    .logo-preview-meta{display:flex;flex-direction:column;gap:2px;font-size:0.78rem;color:#444;}
+    .logo-preview-meta code{color:#222;}
+    .logo-preview-meta .muted{color:#777;}
     .actions-cell{display:flex;gap:6px;flex-wrap:wrap;}
     footer{text-align:center;padding:1.5rem;color:var(--text-muted);
       font-size:0.75rem;border-top:1px solid var(--border);opacity:0.7;}
@@ -111,8 +118,11 @@
     <div class="page-wrapper">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for categoria, msg in messages %}
+          {% if categoria == 'success' %}{% set flash_icone = 'check-circle' %}
+          {% elif categoria == 'warning' %}{% set flash_icone = 'triangle-exclamation' %}
+          {% else %}{% set flash_icone = 'exclamation-circle' %}{% endif %}
           <div class="flash {{ categoria }}">
-            <i class="fas fa-{{ 'check-circle' if categoria == 'success' else 'exclamation-circle' }}"></i>
+            <i class="fas fa-{{ flash_icone }}"></i>
             {{ msg }}
           </div>
         {% endfor %}

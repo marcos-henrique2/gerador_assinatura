@@ -43,12 +43,26 @@
       {{ form.logo_tem_barra.label }}
     </div>
 
+    {% if modo == 'editar' and logo_info %}
+    <div class="form-field">
+      <label>Logo atual</label>
+      <div class="logo-preview">
+        <img src="{{ url_for('static', filename='images/' ~ logo_info.nome) }}?v={{ logo_info.v }}"
+             alt="Logo de {{ marca }}" />
+        <div class="logo-preview-meta">
+          <code>{{ logo_info.nome }}</code>
+          <span class="muted">{{ '%.1f'|format(logo_info.tamanho / 1024) }} KB</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="form-field">
       {{ form.logo.label }}
       {{ form.logo() }}
       {% if modo == 'editar' and dados_marca %}
         <span class="muted" style="font-size:0.74rem;">
-          Logo atual: <code>{{ dados_marca.get('logo', '—') }}</code> — deixe vazio para manter.
+          PNG, máx. 5 MB. Deixe vazio para manter a logo atual.
         </span>
       {% else %}
         <span class="muted" style="font-size:0.74rem;">PNG, máx. 5 MB. Será otimizada automaticamente.</span>

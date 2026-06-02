@@ -14,10 +14,44 @@ from werkzeug.security import check_password_hash
 
 import storage
 from forms import LoginForm, MarcaCriarForm, MarcaForm, UnidadeForm
-from logos import LogoInvalida, processar_upload
+from logos import (PASTA_LOGOS, TAMANHO_ALVO, LogoInvalida,
+                   processar_upload)
 from utils import gerar_slug
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+
+def _info_logo(nome_arquivo: str | None) -> dict | None:
+    """Retorna dados da logo atual para preview (nome + cache-buster).
+
+    O cache-buster usa o mtime do arquivo, garantindo que o navegador
+    recarregue a imagem assim que uma nova logo for gravada.
+    """
+    if not nome_arquivo:
+        return None
+    caminho = os.path.join(PASTA_LOGOS, nome_arquivo)
+    if not os.path.exists(caminho):
+        return None
+    return {
+        'nome': nome_arquivo,
+        'tamanho': os.path.getsize(caminho),
+        'v': int(os.path.getmtime(caminho)),
+    }
+
+
+def _flash_otimizacao(resultado: dict) -> None:
+    """Emite um flash informando o tamanho final da logo otimizada."""
+    kb = resultado['tamanho'] / 1024
+    if resultado['excedeu']:
+        limite_kb = TAMANHO_ALVO / 1024
+        flash(
+            f'Atenção: a logo ficou com {kb:.1f} KB, acima do ideal '
+            f'({limite_kb:.0f} KB) para o Zimbra. '
+            f'Considere uma imagem mais simples.',
+            'warning')
+    else:
+        flash(f'Logo otimizada: {kb:.1f} KB — pronta para o Zimbra.',
+              'success')
 
 
 def login_required(view):
@@ -86,14 +120,15 @@ def marca_nova():
                                    modo='nova')
         slug = gerar_slug(nome)
         try:
-            nome_logo = processar_upload(form.logo.data, slug)
+            resultado_logo = processar_upload(form.logo.data, slug)
         except LogoInvalida as e:
             flash(f'Erro na logo: {e}', 'error')
             return render_template('admin/marca_form.html', form=form,
                                    modo='nova')
+        _flash_otimizacao(resultado_logo)
 
         nova = {
-            'logo': nome_logo,
+            'logo': resultado_logo['nome'],
             'categoria': form.categoria.data,
             'icone': form.icone.data,
             'concessionarias': {},
@@ -134,20 +169,25 @@ def marca_editar(marca):
         else:
             registro.pop('logo_tem_barra', None)
 
+        resultado_logo = None
         if form.logo.data:
             try:
-                registro['logo'] = processar_upload(form.logo.data, slug)
+                resultado_logo = processar_upload(form.logo.data, slug)
             except LogoInvalida as e:
                 flash(f'Erro na logo: {e}', 'error')
                 return render_template('admin/marca_form.html', form=form,
                                        modo='editar', marca=marca,
                                        dados_marca=marcas[marca])
+            registro['logo'] = resultado_logo['nome']
         storage.salvar_marcas(dados)
         flash('Marca atualizada.', 'success')
+        if resultado_logo:
+            _flash_otimizacao(resultado_logo)
         return redirect(url_for('admin.marca_editar', marca=marca))
 
     return render_template('admin/marca_form.html', form=form, modo='editar',
-                           marca=marca, dados_marca=marcas[marca])
+                           marca=marca, dados_marca=marcas[marca],
+                           logo_info=_info_logo(marcas[marca].get('logo')))
 
 
 @admin_bp.route('/marca/<marca>/excluir', methods=['POST'])

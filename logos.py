@@ -73,11 +73,14 @@ def _otimizar(img: Image.Image) -> bytes:
     return saida
 
 
-def processar_upload(file_storage, slug: str) -> str:
+def processar_upload(file_storage, slug: str) -> dict:
     """Valida, otimiza e grava a logo em static/images/<slug>.png.
 
     O nome do arquivo é derivado do slug (NÃO do nome enviado).
-    Retorna o nome do arquivo gravado (ex.: 'renault.png').
+    Retorna um dict com:
+        - 'nome': nome do arquivo gravado (ex.: 'renault.png')
+        - 'tamanho': tamanho final em bytes
+        - 'excedeu': True se ultrapassou TAMANHO_ALVO (limite do Zimbra)
     """
     slug_seguro = secure_filename(slug) or 'logo'
     img = _validar_png(file_storage)
@@ -88,4 +91,10 @@ def processar_upload(file_storage, slug: str) -> str:
     destino = os.path.join(PASTA_LOGOS, nome_arquivo)
     with open(destino, 'wb') as f:
         f.write(dados_png)
-    return nome_arquivo
+
+    tamanho = len(dados_png)
+    return {
+        'nome': nome_arquivo,
+        'tamanho': tamanho,
+        'excedeu': tamanho > TAMANHO_ALVO,
+    }
