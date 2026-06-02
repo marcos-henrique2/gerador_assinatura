@@ -170,6 +170,37 @@
   }
 
   .no-results i { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.4; }
+
+  .admin-footer {
+    text-align: center;
+    margin-top: 2.5rem;
+  }
+
+  .admin-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--glass);
+    opacity: 0.65;
+    transition: all 0.2s;
+  }
+
+  .admin-link:hover {
+    opacity: 1;
+    color: var(--text);
+    border-color: rgba(255,255,255,0.15);
+    background: var(--glass-hover);
+  }
+
+  .admin-link i { font-size: 11px; }
 </style>
 
 <div class="stats-row animate-in delay-1">
@@ -206,6 +237,12 @@
 <div class="no-results" id="noResults">
   <div><i class="fas fa-search"></i></div>
   <p>Nenhum resultado encontrado.</p>
+</div>
+
+<div class="admin-footer animate-in delay-3">
+  <a class="admin-link" href="{{ url_for('admin.login') }}">
+    <i class="fas fa-lock"></i> Área administrativa
+  </a>
 </div>
 
 <script>
