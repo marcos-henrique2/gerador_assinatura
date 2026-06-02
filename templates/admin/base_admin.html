@@ -32,6 +32,8 @@
     .nav-actions{display:flex;align-items:center;gap:1rem;}
     .nav-link{color:var(--text-muted);text-decoration:none;font-size:0.82rem;font-weight:500;}
     .nav-link:hover{color:var(--text);}
+    .logout-form{margin:0;padding:0;display:inline-flex;}
+    .logout-btn{background:none;border:none;padding:0;cursor:pointer;font-family:inherit;line-height:inherit;}
     main{flex:1;padding:2.5rem 1.5rem;}
     .page-wrapper{width:100%;max-width:1000px;margin:0 auto;}
     .glass-card{background:var(--glass);border:1px solid var(--border);
@@ -107,9 +109,12 @@
       <a class="nav-link" href="{{ url_for('index') }}" target="_blank">
         <i class="fas fa-external-link-alt"></i> Ver site
       </a>
-      <a class="nav-link" href="{{ url_for('admin.logout') }}">
-        <i class="fas fa-sign-out-alt"></i> Sair
-      </a>
+      <form method="POST" action="{{ url_for('admin.logout') }}" class="logout-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="nav-link logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
+      </form>
     </div>
   </nav>
   {% endif %}

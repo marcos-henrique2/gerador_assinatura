@@ -92,7 +92,8 @@ def login():
     return render_template('admin/login.html', form=form)
 
 
-@admin_bp.route('/logout')
+@admin_bp.route('/logout', methods=['POST'])
+@login_required
 def logout():
     session.clear()
     return redirect(url_for('admin.login'))
