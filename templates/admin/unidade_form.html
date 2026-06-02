@@ -1,0 +1,62 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<p style="margin-bottom:1rem;">
+  <a class="link" href="{{ url_for('admin.marca_editar', marca=marca) }}">&larr; Voltar para {{ marca }}</a>
+</p>
+
+<div class="section-header">
+  <div class="eyebrow">{{ marca }}</div>
+  <h1>{{ 'Nova unidade' if modo == 'nova' else 'Editar unidade' }}</h1>
+</div>
+
+<div class="glass-card">
+  <form method="POST"
+        action="{{ url_for('admin.unidade_nova', marca=marca) if modo == 'nova' else url_for('admin.unidade_editar', marca=marca, unidade=unidade) }}">
+    {{ form.csrf_token }}
+
+    <div class="form-field">
+      {{ form.nome.label }}
+      {{ form.nome(placeholder='Ex: Renault - Campinas') }}
+      {% for erro in form.nome.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.endereco.label }}
+      {{ form.endereco(placeholder='Ex: Av. T-63, 1707 - Nova Suíça') }}
+      {% for erro in form.endereco.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.cidade.label }}
+      {{ form.cidade(placeholder='Ex: Goiânia - GO') }}
+      {% for erro in form.cidade.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.cep.label }}
+      {{ form.cep(placeholder='99999-999') }}
+      {% for erro in form.cep.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.telefone.label }}
+      {{ form.telefone(placeholder='(62) 3000-0000') }}
+      {% for erro in form.telefone.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.site.label }}
+      {{ form.site(placeholder='www.navesa.com.br') }}
+      {% for erro in form.site.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:1rem;">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {{ 'Adicionar unidade' if modo == 'nova' else 'Salvar alterações' }}
+      </button>
+      <a class="btn btn-ghost" href="{{ url_for('admin.marca_editar', marca=marca) }}">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

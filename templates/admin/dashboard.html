@@ -1,0 +1,58 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div class="section-header" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+  <div>
+    <div class="eyebrow">Gestão de dados</div>
+    <h1>Marcas e Unidades</h1>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('admin.marca_nova') }}">
+    <i class="fas fa-plus"></i> Nova marca
+  </a>
+</div>
+
+<div class="glass-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Marca</th>
+        <th>Categoria</th>
+        <th>Unidades</th>
+        <th>Logo</th>
+        <th style="text-align:right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for nome, dados in marcas.items() %}
+      <tr>
+        <td>
+          <i class="fas fa-{{ dados.get('icone', 'building') }}" style="color:var(--blue-light);margin-right:6px;"></i>
+          <strong>{{ nome }}</strong>
+        </td>
+        <td><span class="tag">{{ dados.get('categoria', '—') }}</span></td>
+        <td class="muted">{{ dados.get('concessionarias', {}) | length }}</td>
+        <td class="muted" style="font-family:'DM Mono',monospace;font-size:0.78rem;">{{ dados.get('logo', '—') }}</td>
+        <td>
+          <div class="actions-cell" style="justify-content:flex-end;">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('admin.marca_editar', marca=nome) }}">
+              <i class="fas fa-pen"></i> Editar
+            </a>
+            <form class="inline-form" method="POST"
+                  action="{{ url_for('admin.marca_excluir', marca=nome) }}"
+                  onsubmit="return confirm('Excluir a marca \'{{ nome }}\' e todas as suas unidades?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-danger btn-sm">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if not marcas %}
+    <p class="muted" style="text-align:center;padding:1.5rem;">Nenhuma marca cadastrada ainda.</p>
+  {% endif %}
+</div>
+{% endblock %}

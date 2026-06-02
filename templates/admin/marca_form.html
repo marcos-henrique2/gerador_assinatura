@@ -1,0 +1,108 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<p style="margin-bottom:1rem;">
+  <a class="link" href="{{ url_for('admin.dashboard') }}">&larr; Voltar ao painel</a>
+</p>
+
+<div class="section-header">
+  <div class="eyebrow">{{ 'Nova marca' if modo == 'nova' else 'Editar marca' }}</div>
+  <h1>{{ 'Cadastrar marca' if modo == 'nova' else marca }}</h1>
+</div>
+
+<div class="glass-card">
+  <form method="POST" enctype="multipart/form-data"
+        action="{{ url_for('admin.marca_nova') if modo == 'nova' else url_for('admin.marca_editar', marca=marca) }}">
+    {{ form.csrf_token }}
+
+    <div class="form-field">
+      {{ form.nome.label }}
+      {% if modo == 'editar' %}
+        {{ form.nome(readonly=true) }}
+        <span class="muted" style="font-size:0.74rem;">O nome (chave) é imutável após criada a marca.</span>
+      {% else %}
+        {{ form.nome(placeholder='Ex: Renault') }}
+      {% endif %}
+      {% for erro in form.nome.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.categoria.label }}
+      {{ form.categoria() }}
+      {% for erro in form.categoria.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="form-field">
+      {{ form.icone.label }}
+      {{ form.icone() }}
+      {% for erro in form.icone.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div class="check-row">
+      {{ form.logo_tem_barra() }}
+      {{ form.logo_tem_barra.label }}
+    </div>
+
+    <div class="form-field">
+      {{ form.logo.label }}
+      {{ form.logo() }}
+      {% if modo == 'editar' and dados_marca %}
+        <span class="muted" style="font-size:0.74rem;">
+          Logo atual: <code>{{ dados_marca.get('logo', '—') }}</code> — deixe vazio para manter.
+        </span>
+      {% else %}
+        <span class="muted" style="font-size:0.74rem;">PNG, máx. 5 MB. Será otimizada automaticamente.</span>
+      {% endif %}
+      {% for erro in form.logo.errors %}<span class="field-error">{{ erro }}</span>{% endfor %}
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:1rem;">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {{ 'Criar marca' if modo == 'nova' else 'Salvar alterações' }}
+      </button>
+      <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+{% if modo == 'editar' and dados_marca %}
+<div class="glass-card" style="margin-top:1.25rem;">
+  <div class="section-header" style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;">
+    <h1 style="font-size:1.1rem;">Unidades</h1>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('admin.unidade_nova', marca=marca) }}">
+      <i class="fas fa-plus"></i> Nova unidade
+    </a>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Unidade</th><th>Cidade</th><th>Telefone</th><th style="text-align:right;">Ações</th></tr>
+    </thead>
+    <tbody>
+      {% for nome_u, dados_u in dados_marca.get('concessionarias', {}).items() %}
+      <tr>
+        <td><strong>{{ nome_u }}</strong><br><span class="muted" style="font-size:0.76rem;">{{ dados_u.get('endereco', '') }}</span></td>
+        <td class="muted">{{ dados_u.get('cidade', '—') }}</td>
+        <td class="muted">{{ dados_u.get('telefone', '') or '—' }}</td>
+        <td>
+          <div class="actions-cell" style="justify-content:flex-end;">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('admin.unidade_editar', marca=marca, unidade=nome_u) }}">
+              <i class="fas fa-pen"></i>
+            </a>
+            <form class="inline-form" method="POST"
+                  action="{{ url_for('admin.unidade_excluir', marca=marca, unidade=nome_u) }}"
+                  onsubmit="return confirm('Excluir a unidade \'{{ nome_u }}\'?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if not dados_marca.get('concessionarias') %}
+    <p class="muted" style="text-align:center;padding:1rem;">Nenhuma unidade cadastrada.</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

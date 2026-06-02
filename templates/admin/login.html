@@ -1,0 +1,29 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div style="max-width:380px;margin:3rem auto;">
+  <div class="glass-card">
+    <div class="section-header" style="text-align:center;">
+      <div class="eyebrow">Acesso restrito</div>
+      <h1 style="font-size:1.4rem;">Painel Administrativo</h1>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.login') }}">
+      {{ form.csrf_token }}
+      <div class="form-field">
+        {{ form.senha.label }}
+        {{ form.senha(placeholder='Digite a senha do painel') }}
+        {% for erro in form.senha.errors %}
+          <span class="field-error">{{ erro }}</span>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">
+        <i class="fas fa-lock-open"></i> Entrar
+      </button>
+    </form>
+  </div>
+  <p style="text-align:center;margin-top:1rem;">
+    <a class="link" href="{{ url_for('index') }}">&larr; Voltar ao site</a>
+  </p>
+</div>
+{% endblock %}
