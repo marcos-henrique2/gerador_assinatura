@@ -7,6 +7,7 @@ anterior e usam escrita atômica (arquivo temporário + os.replace).
 """
 import json
 import os
+import shutil
 import tempfile
 import threading
 from datetime import datetime
@@ -14,6 +15,7 @@ from datetime import datetime
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 MARCAS_PATH = os.path.join(DATA_DIR, 'marcas.json')
+EXEMPLO_PATH = os.path.join(DATA_DIR, 'marcas.example.json')
 BACKUPS_DIR = os.path.join(DATA_DIR, 'backups')
 
 MAX_BACKUPS = 20
@@ -22,7 +24,27 @@ _lock = threading.Lock()
 _marcas: dict = {}
 
 
+def _garantir_fonte_de_dados() -> None:
+    """Garante que data/marcas.json exista no primeiro boot.
+
+    Em um clone novo, marcas.json (gitignored) não existe — só a seed
+    versionada marcas.example.json. Nesse caso, copia o exemplo para
+    marcas.json. Se marcas.json já existe (caso normal/servidor em uso),
+    nada é alterado: NUNCA sobrescreve o arquivo real com o exemplo.
+    """
+    if os.path.exists(MARCAS_PATH):
+        return
+    if not os.path.exists(EXEMPLO_PATH):
+        raise RuntimeError(
+            "Nenhuma fonte de dados encontrada: faltam "
+            "data/marcas.json e data/marcas.example.json."
+        )
+    os.makedirs(DATA_DIR, exist_ok=True)
+    shutil.copyfile(EXEMPLO_PATH, MARCAS_PATH)
+
+
 def _carregar_do_disco() -> dict:
+    _garantir_fonte_de_dados()
     with open(MARCAS_PATH, 'r', encoding='utf-8') as f:
         return json.load(f)
 
