@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 .env
 instance/
+
+# Dados de produção — fonte de verdade fica no servidor
+data/marcas.json
+data/backups/*
+!data/backups/.gitkeep

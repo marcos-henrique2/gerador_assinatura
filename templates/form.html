@@ -244,6 +244,7 @@
   </div>
 
   <form method="POST" action="{{ url_for('resultado') }}" id="sigForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="marca_selecionada" value="{{ nome_marca }}">
 
     <!-- STEP 1: Dados Pessoais -->
