@@ -17,6 +17,7 @@ PASTA_LOGOS = os.path.join(BASE_DIR, 'static', 'images')
 LARGURA_MAX = 200      # px — largura máxima da logo na assinatura
 ALTURA_MAX = 80        # px — altura máxima
 TAMANHO_ALVO = 5_000   # bytes — limite alvo
+MAX_PIXELS = 25_000_000  # px — limite seguro de área (anti decompression bomb)
 
 
 class LogoInvalida(Exception):
@@ -42,6 +43,13 @@ def _validar_png(file_storage) -> Image.Image:
 
     # 2ª passada: reabre para uso real (verify() consome o stream)
     img = Image.open(io.BytesIO(dados))
+
+    # Anti decompression bomb: checa dimensões via .size (disponível logo
+    # após open(), sem load()) ANTES de carregar os pixels na memória.
+    largura, altura = img.size
+    if largura * altura > MAX_PIXELS:
+        raise LogoInvalida('Imagem com dimensões muito grandes (máx. 25 megapixels).')
+
     img.load()
     return img
 
